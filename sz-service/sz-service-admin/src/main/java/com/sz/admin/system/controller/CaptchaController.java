@@ -42,8 +42,10 @@ public class CaptchaController {
     @GetMapping("status")
     @Operation(summary = "验证码是否启用")
     public ApiResult<Boolean> captchaStatus() {
-        String value = SysConfigUtils.getConfValue("sys.captcha.state");
-        return ApiResult.success(Boolean.parseBoolean(value));
+        // 直接返回 false，禁用验证码
+        return ApiResult.success(false);
+        // String value = SysConfigUtils.getConfValue("sys.captcha.state");
+        // return ApiResult.success(Boolean.parseBoolean(value));
     }
 
     @SaIgnore

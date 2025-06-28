@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sz.admin.cms.mapper.CmsCategoryClosureMapper">
+
+    <!-- 插入分类闭包关系 -->
+    <insert id="insertClosure">
+        INSERT INTO cms_category_closure (ancestor_id, descendant_id, depth)
+        SELECT 
+            cc.ancestor_id, 
+            #{descendantId}, 
+            cc.depth + 1
+        FROM cms_category_closure cc
+        WHERE cc.descendant_id = #{ancestorId}
+        UNION ALL
+        SELECT #{descendantId}, #{descendantId}, 0
+    </insert>
+
+    <!-- 删除分类的所有闭包关系 -->
+    <delete id="deleteByCategoryId">
+        DELETE FROM cms_category_closure 
+        WHERE ancestor_id = #{categoryId} OR descendant_id = #{categoryId}
+    </delete>
+
+    <!-- 查询分类的所有子分类ID -->
+    <select id="selectDescendantIds" resultType="java.lang.Long">
+        SELECT descendant_id 
+        FROM cms_category_closure 
+        WHERE ancestor_id = #{categoryId} AND depth > 0
+    </select>
+
+    <!-- 查询分类的所有父分类ID -->
+    <select id="selectAncestorIds" resultType="java.lang.Long">
+        SELECT ancestor_id 
+        FROM cms_category_closure 
+        WHERE descendant_id = #{categoryId} AND depth > 0
+    </select>
+
+</mapper>

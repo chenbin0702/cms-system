@@ -23,6 +23,8 @@ mvn spring-boot:run -pl sz-service/sz-service-admin -Dspring-boot.run.profiles=l
 java -jar sz-service/sz-service-admin/target/sz-service-admin-1.2.4-beta-SNAPSHOT.jar --spring.profiles.active=local
 ```
 
+
+
 ### Code Quality
 ```bash
 # Check code formatting
@@ -102,3 +104,7 @@ The `sz-common-generator` module provides automated CRUD code generation for bot
 - MySQL >= 8.0.34
 - Maven >= 3.8
 - Node >= 18.x (for frontend development)
+
+
+
+写开发代码时候先https://szadmin.cn/md/访问这个熟悉项目规划

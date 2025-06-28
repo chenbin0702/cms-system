@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sz.admin.cms.mapper.CmsCategoryMapper">
+
+    <!-- 查询分类树形结构 -->
+    <select id="selectCategoryTree" resultType="com.sz.admin.cms.pojo.vo.cmscategory.CmsCategoryTreeVO">
+        SELECT 
+            id,
+            name,
+            pid,
+            deep,
+            sort,
+            has_children AS hasChildren,
+            status,
+            icon,
+            description
+        FROM cms_category 
+        WHERE del_flag = 'F' 
+        ORDER BY sort ASC, id ASC
+    </select>
+
+    <!-- 根据父级ID查询子分类 -->
+    <select id="selectByPid" resultType="com.sz.admin.cms.pojo.po.CmsCategory">
+        SELECT * FROM cms_category 
+        WHERE pid = #{pid} AND del_flag = 'F' 
+        ORDER BY sort ASC, id ASC
+    </select>
+
+    <!-- 查询分类及其所有子分类ID -->
+    <select id="selectCategoryAndChildren" resultType="java.lang.Long">
+        SELECT DISTINCT cc.descendant_id
+        FROM cms_category_closure cc
+        WHERE cc.ancestor_id = #{categoryId}
+        UNION
+        SELECT #{categoryId}
+    </select>
+
+    <!-- 更新分类的hasChildren字段 -->
+    <update id="updateHasChildren">
+        UPDATE cms_category 
+        SET has_children = #{hasChildren}
+        WHERE id = #{categoryId}
+    </update>
+
+</mapper>

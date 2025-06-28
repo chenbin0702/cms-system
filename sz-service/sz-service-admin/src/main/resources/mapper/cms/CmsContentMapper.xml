@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sz.admin.cms.mapper.CmsContentMapper">
+
+    <!-- 分页查询内容列表 -->
+    <select id="selectContentPage" resultType="com.sz.admin.cms.pojo.vo.cmscontent.CmsContentVO">
+        SELECT 
+            c.id,
+            c.title,
+            c.summary,
+            c.category_id AS categoryId,
+            cat.name AS categoryName,
+            c.author_id AS authorId,
+            u.username AS authorName,
+            c.status,
+            c.content_type AS contentType,
+            c.cover_image_id AS coverImageId,
+            f.url AS coverImageUrl,
+            c.view_count AS viewCount,
+            c.sort,
+            c.is_top AS isTop,
+            c.is_hot AS isHot,
+            c.publish_time AS publishTime,
+            c.seo_title AS seoTitle,
+            c.seo_keywords AS seoKeywords,
+            c.seo_description AS seoDescription,
+            c.create_time AS createTime,
+            c.update_time AS updateTime
+        FROM cms_content c
+        LEFT JOIN cms_category cat ON c.category_id = cat.id
+        LEFT JOIN sys_user u ON c.author_id = u.id
+        LEFT JOIN sys_file f ON c.cover_image_id = f.id
+        <where>
+            c.del_flag = 'F'
+            <if test="dto.title != null and dto.title != ''">
+                AND c.title LIKE CONCAT('%', #{dto.title}, '%')
+            </if>
+            <if test="dto.categoryId != null">
+                AND c.category_id = #{dto.categoryId}
+            </if>
+            <if test="dto.authorId != null">
+                AND c.author_id = #{dto.authorId}
+            </if>
+            <if test="dto.status != null and dto.status != ''">
+                AND c.status = #{dto.status}
+            </if>
+            <if test="dto.contentType != null and dto.contentType != ''">
+                AND c.content_type = #{dto.contentType}
+            </if>
+            <if test="dto.isTop != null and dto.isTop != ''">
+                AND c.is_top = #{dto.isTop}
+            </if>
+            <if test="dto.isHot != null and dto.isHot != ''">
+                AND c.is_hot = #{dto.isHot}
+            </if>
+            <if test="dto.publishTimeStart != null">
+                AND c.publish_time >= #{dto.publishTimeStart}
+            </if>
+            <if test="dto.publishTimeEnd != null">
+                AND c.publish_time &lt;= #{dto.publishTimeEnd}
+            </if>
+        </where>
+        ORDER BY c.is_top DESC, c.sort ASC, c.id DESC
+    </select>
+
+    <!-- 根据ID查询内容详情 -->
+    <select id="selectContentById" resultType="com.sz.admin.cms.pojo.vo.cmscontent.CmsContentVO">
+        SELECT 
+            c.id,
+            c.title,
+            c.content,
+            c.summary,
+            c.category_id AS categoryId,
+            cat.name AS categoryName,
+            c.author_id AS authorId,
+            u.username AS authorName,
+            c.status,
+            c.content_type AS contentType,
+            c.cover_image_id AS coverImageId,
+            f.url AS coverImageUrl,
+            c.view_count AS viewCount,
+            c.sort,
+            c.is_top AS isTop,
+            c.is_hot AS isHot,
+            c.publish_time AS publishTime,
+            c.seo_title AS seoTitle,
+            c.seo_keywords AS seoKeywords,
+            c.seo_description AS seoDescription,
+            c.create_time AS createTime,
+            c.update_time AS updateTime
+        FROM cms_content c
+        LEFT JOIN cms_category cat ON c.category_id = cat.id
+        LEFT JOIN sys_user u ON c.author_id = u.id
+        LEFT JOIN sys_file f ON c.cover_image_id = f.id
+        WHERE c.id = #{id} AND c.del_flag = 'F'
+    </select>
+
+    <!-- 增加查看次数 -->
+    <update id="incrementViewCount">
+        UPDATE cms_content 
+        SET view_count = IFNULL(view_count, 0) + 1 
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据分类ID统计内容数量 -->
+    <select id="countByCategoryId" resultType="java.lang.Long">
+        SELECT COUNT(1) 
+        FROM cms_content 
+        WHERE category_id = #{categoryId} AND del_flag = 'F'
+    </select>
+
+</mapper>
